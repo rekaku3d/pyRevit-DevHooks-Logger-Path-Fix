@@ -1,0 +1,46 @@
+@echo off
+setlocal enabledelayedexpansion
+
+echo ===================================================
+echo       pyRevit DevHooks Logger Path Patcher
+echo ===================================================
+echo.
+
+:: 1. Define target file path inside AppData
+set "TARGET_FILE=%APPDATA%\pyRevit-Master\extensions\pyRevitDevHooks.extension\lib\hooks_logger.py"
+set "TEMP_FILE=%TEMP%\hooks_logger_tmp.py"
+
+:: 2. Check if file exists
+if not exist "%TARGET_FILE%" (
+    echo [ERROR] Could not find hooks_logger.py at:
+    echo "%TARGET_FILE%"
+    echo.
+    echo Please ensure pyRevit and the DevHooks extension are installed.
+    pause
+    exit /b
+)
+
+echo [INFO] Found target file. Patching path configuration...
+
+:: 3. Read and replace the buggy desktop line dynamically
+if exist "%TEMP_FILE%" del "%TEMP_FILE%"
+for /f "delims=" %%A in ('type "%TARGET_FILE%"') do (
+    set "line=%%A"
+    :: Look for the specific broken line and swap it with a dynamic fallback environment variable string
+    if "!line!"=="USER_DESKTOP = op.expandvars('%%userprofile%%\\desktop')" (
+        set "line=USER_DESKTOP = op.expandvars('%%userprofile%%\\Desktop')"
+    )
+    if "!line!"=="USER_DESKTOP = op.expandvars('%%userprofile%%\desktop')" (
+        set "line=USER_DESKTOP = op.expandvars('%%userprofile%%\Desktop')"
+    )
+    echo !line!>>"%TEMP_FILE%"
+)
+
+:: 4. Overwrite original file with patched version
+move /y "%TEMP_FILE%" "%TARGET_FILE%" >nul
+
+echo [SUCCESS] Path successfully patched to 'Desktop'!
+echo.
+echo Please reload pyRevit or restart Revit for changes to take effect.
+echo.
+pause
