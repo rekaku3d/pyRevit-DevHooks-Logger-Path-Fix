@@ -42,3 +42,10 @@ USER_DESKTOP = op.expandvars('%userprofile%\desktop')
        else:
            USER_DESKTOP = op.join(op.expanduser("~"), "Desktop")
 Save the file and reload your pyRevit extension tab inside Revit.
+
+Or 
+
+Create a simple 1-click batch file (.bat). They just need to double-click it, and it will automatically find their hooks_logger.py file, patch the path issue, and resolve the problem instantly.
+
+The 1-Click Fix Code is in Fix_pyRevit_Logs
+Open Notepad, paste the block below into it, and save the file as Fix_pyRevit_Logs.bat (make sure the extension ends in .bat, not .txt).
